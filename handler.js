@@ -2,7 +2,7 @@
 
 var AWS = require('aws-sdk');
 
-module.exports.hello = (event, context, callback) => {
+module.exports.sign = (event, context, callback) => {
   var s3 = new AWS.S3();
   console.log(event.body);
   var params = JSON.parse(event.body);
@@ -22,4 +22,7 @@ module.exports.hello = (event, context, callback) => {
     },
     body: JSON.stringify({ uploadURL: uploadURL }),
   })
+}
+module.exports.updateDB = (event, context, callback) => {
+  console.log("updated db");
 }

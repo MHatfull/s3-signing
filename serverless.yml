@@ -7,33 +7,52 @@ provider:
     - Effect: "Allow"
       Action:
         - "s3:*"
-      Resource: "arn:aws:s3:::stories.underlunchers.co.uk/*"
+      Resource: "*"
 
 
 functions:
-  hello:
-    handler: handler.hello
+  sign:
+    handler: handler.sign
     events:
       - http:
           path: /
           method: post
           cors: true
+  updateDB:
+    handler: handler.updateDB
+    events:
+      - s3:
+          bucket: stories.underlunchers.co.uk
 
-#resources:
-#  Resources:
-#    UploadBucket:
-#      Type: AWS::S3::Bucket
-#      Properties:
-#        BucketName: stories.underlunchers.co.uk
-#        AccessControl: PublicRead
-#        CorsConfiguration:
-#          CorsRules:
-#          - AllowedMethods:
-#            - GET
-#            - PUT
-#            - POST
-#            - HEAD
-#            AllowedOrigins:
-#            - "*"
-#            AllowedHeaders:
-#            - "*"
+  
+
+resources:
+  Resources:
+    UploadBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: stories.underlunchers.co.uk
+        AccessControl: PublicRead
+        CorsConfiguration:
+          CorsRules:
+          - AllowedMethods:
+            - GET
+            - PUT
+            - POST
+            - HEAD
+            AllowedOrigins:
+            - "*"
+            AllowedHeaders:
+            - "*"
+    UpdateDBLambdaPermissionStoriesS3:
+      Type: "AWS::Lambda::Permission"
+      Properties:
+        FunctionName:
+          "Fn::GetAtt":
+            - UpdateDBLambdaFunction
+            - Arn
+        Principal: "s3.amazonaws.com"
+        Action: "lambda:InvokeFunction"
+        SourceAccount:
+          Ref: AWS::AccountId
+        SourceArn: "arn:aws:s3:::stories.underlunchers.co.uk"
