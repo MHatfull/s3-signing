@@ -23,6 +23,24 @@ module.exports.sign = (event, context, callback) => {
     body: JSON.stringify({ uploadURL: uploadURL }),
   })
 }
+
 module.exports.updateDB = (event, context, callback) => {
-  console.log("updated db");
+  console.log('Received event:', JSON.stringify(event));
+  var ddb = new AWS.DynamoDB({apiVersion: '2012-10-08'});
+
+  var params = {
+    TableName: 'stories',
+    Item: {
+      'story' : { S: event.Records[0].s3.object.key },
+      'size' : { N: event.Records[0].s3.object.size.toString() }
+    }
+  };
+
+  ddb.putItem(params, function(err, data) {
+    if (err) {
+      console.log("Error", err);
+    } else {
+      console.log("Success", data);
+    }
+  });
 }
