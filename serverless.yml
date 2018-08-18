@@ -25,6 +25,13 @@ functions:
       - s3:
           bucket: stories.underlunchers.co.uk
           event: s3:ObjectCreated:*
+  retrieveStories:
+    handler: handler.retrieveStories
+    events:
+      - http:
+          path: /
+          method: get
+          cors: true
 
 
 
